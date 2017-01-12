@@ -1,6 +1,8 @@
 # hello.py
 
 from flask import Flask
+import numpy as np
+import chainer
 
 app = Flask(__name__)
 

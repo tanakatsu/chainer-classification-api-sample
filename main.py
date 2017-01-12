@@ -1,9 +1,11 @@
 # hello.py
 
-from flask import Flask
+from flask import Flask, request, render_template
 import numpy as np
 import chainer
 from PIL import Image
+import json
+import imageutil
 
 app = Flask(__name__)
 

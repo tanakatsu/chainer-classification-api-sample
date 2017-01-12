@@ -14,7 +14,7 @@ def hello_world():
     width, height = img.size
     print(img)
     print(width, height)
-    return 'hello Falsk'
+    return 'Hello.'
 
 if __name__ == '__main__':
     app.debug = True

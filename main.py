@@ -71,6 +71,11 @@ def predict_json():
 def upload():
     return render_template('upload.html')
 
+
+@app.route('/upload2')
+def upload_by_drag_and_drop():
+    return render_template('upload_drop.html')
+
 if __name__ == '__main__':
     app.debug = True
     app.run()

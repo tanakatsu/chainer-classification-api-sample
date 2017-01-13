@@ -1,0 +1,68 @@
+<html>
+  <head>
+    <script src="/static/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        var droppable = $("#droppable");
+
+        if (!window.FileReader) {
+          alert("File API is not supported.");
+          return false;
+        }
+
+        var cancelEvent = function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+
+        droppable.bind("dragenter", cancelEvent);
+        droppable.bind("dragover", cancelEvent);
+
+        var submitFile = function(data) {
+          $("#status").text('uploading...');
+
+          $.ajax({
+            url: "/predict.json",
+            type: "GET",
+            data: {data: data},
+            dataType: "json"
+          }).done(function(data) {
+            $("#status").text(JSON.stringify(data));
+          }).fail(function(data) {
+            $("#status").text('Upload error!');
+          });
+        }
+
+        var handleDroppedFile = function(event) {
+          var file = event.originalEvent.dataTransfer.files[0];
+          
+          if (file.type.match('image.*')) {
+            var fileReader = new FileReader();
+            fileReader.onload = function(event) {
+              //$("#droppable").text("[" + file.name + "]" + event.target.result);
+              var image = "<img class='thumbnail' width='128' src='" + event.target.result + "'" + "title='" + file.name + "'/>";
+
+              $("#droppable").append(image);
+              submitFile(event.target.result);
+            }
+            fileReader.readAsDataURL(file);
+          } else {
+            alert("Image file is only supported.");
+          }
+
+          cancelEvent(event);
+          return false;
+        }
+
+        droppable.bind("drop", handleDroppedFile);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="droppable" style="border: gray solid 1em; padding: 2em;">
+      Drop a file here.
+    </div>
+    <div id="status"></div>
+  </body>
+</html>

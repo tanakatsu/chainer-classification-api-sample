@@ -32,13 +32,15 @@ def predict():
             return '''
             <h3>Error: Invalid parameter</h3>
             '''
-        print(img.size)
+        resized = img.resize((96, 96))
+        print(np.asarray(resized).shape)
         return 'ok'
     else:
         f = request.files['file']
         print(f.filename)
         img = imageutil.read_image_from_file(f)
-        print(img.size)
+        resized = img.resize((96, 96))
+        print(np.asarray(resized).shape)
         return 'ok'
 
 
@@ -53,14 +55,16 @@ def predict_json():
             img = imageutil.read_image_from_url(url)
         else:
             return json.dumps({'error': 'Invalid parameter'})
-        print(img.size)
-        return json.dumps({'size': img.size})
+        resized = img.resize((96, 96))
+        print(np.asarray(resized).shape)
+        return json.dumps({'size': resized.size})
     else:
         f = request.files['file']
         print(f.filename)
         img = imageutil.read_image_from_file(f)
-        print(img.size)
-        return json.dumps({'size': img.size})
+        resized = img.resize((96, 96))
+        print(np.asarray(resized).shape)
+        return json.dumps({'size': resized.size})
 
 
 @app.route('/upload')

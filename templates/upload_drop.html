@@ -19,7 +19,7 @@
         droppable.bind("dragenter", cancelEvent);
         droppable.bind("dragover", cancelEvent);
 
-        var submitFile = function(data) {
+        var submitFileViaGET = function(data) {
           $("#status").text('uploading...');
 
           $.ajax({
@@ -34,7 +34,27 @@
           });
         }
 
+        var submitFile = function(file) {
+          $("#status").text('uploading...');
+
+          var formdata = new FormData();
+          formdata.append("file", file);
+          $.ajax("/predict.json", {
+              method: "POST",
+              data: formdata,
+              dataType: "json",
+              processData: false,
+              contentType: false
+          }).done(function(data) {
+             $("#status").text(JSON.stringify(data));
+          }).fail(function(data) {
+             $("#status").text('Upload error!');
+          });
+        }
+
         var handleDroppedFile = function(event) {
+          $("#thumbnails").html('');
+
           var file = event.originalEvent.dataTransfer.files[0];
           
           if (file.type.match('image.*')) {
@@ -43,8 +63,9 @@
               //$("#droppable").text("[" + file.name + "]" + event.target.result);
               var image = "<img class='thumbnail' width='128' src='" + event.target.result + "'" + "title='" + file.name + "'/>";
 
-              $("#droppable").append(image);
-              submitFile(event.target.result);
+              $("#thumbnails").append(image);
+              //submitFileViaGET(event.target.result); // GET
+              submitFile(file); // POST
             }
             fileReader.readAsDataURL(file);
           } else {
@@ -62,6 +83,7 @@
   <body>
     <div id="droppable" style="border: gray solid 1em; padding: 2em;">
       Drop a file here.
+      <div id="thumbnails"></div>
     </div>
     <div id="status"></div>
   </body>

@@ -22,3 +22,10 @@ def read_image_from_base64(data):
     data = re.sub(r'^data:.+;base64,', '', data)
     decoded = base64.b64decode(data)
     return Image.open(cStringIO.StringIO(decoded))
+
+
+def encode_base64(img):
+    buf = cStringIO.StringIO()
+    img.save(buf, format="JPEG")
+    encoded = base64.b64encode(buf.getvalue())
+    return 'data:image/jpeg;base64,' + encoded

@@ -5,7 +5,6 @@ import chainer
 import chainer.functions as F
 import chainer.links as L
 from chainer import serializers
-import numpy as np
 
 
 # Network definition
@@ -25,13 +24,14 @@ class MLP(chainer.Chain):
         return self.l3(h2)
 
 
-def predict(img):
+def predict(img, top=3):
     model = L.Classifier(MLP(1000, 10))
     serializers.load_npz('model/mnist_model.npz', model)
 
     # Predict
     y = model.predictor(img.reshape(-1, 784))
     pred = F.softmax(y).data
-    label = np.argmax(pred)
-    score = pred[0][label]
-    return label, float(score)
+    labels = pred[0].argsort()[-top:][::-1]
+    scores = pred[0][labels]
+    scores = map(lambda x: float(x), scores)  # Decimal -> float
+    return zip(labels, scores)

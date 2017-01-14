@@ -1,10 +1,10 @@
 <!doctype html>
 <h2>Result</h2>
-<div>Label: {{label}} (score={{score}})</div>
-<br/>
 {% if image %}  
-<h3>Uploaded file</h3>
 <div><img src="{{image}}" /></div>
-<br/>
 {% endif %}
+{% for result in results %}
+<div>Label: {{result[0]}} (score={{result[1]}})</div>
+{% endfor %}
+<br/>
 <div><a href="/upload">Back</a></div>

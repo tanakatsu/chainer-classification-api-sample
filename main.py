@@ -32,14 +32,14 @@ def predict():
             <h3>Error: Invalid parameter</h3>
             '''
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        label, score = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
-        return render_template('result.html', label=label, score=score, image=imageutil.encode_base64(img))
+        results = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
+        return render_template('result.html', results=results, image=imageutil.encode_base64(img))
     else:
         f = request.files['file']
         img = imageutil.read_image_from_file(f)
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        label, score = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
-        return render_template('result.html', label=label, score=score, image=imageutil.encode_base64(img))
+        results = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
+        return render_template('result.html', results=results, image=imageutil.encode_base64(img))
 
 
 @app.route('/predict.json', methods=['GET', 'POST'])
@@ -54,15 +54,15 @@ def predict_json():
         else:
             return json.dumps({'error': 'Invalid parameter'})
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        label, score = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
-        return json.dumps({'label': label, 'score': score})
+        results = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
+        return json.dumps([{'label': x[0], 'score': x[1]} for x in results])
     else:
         f = request.files['file']
         print(f.filename)
         img = imageutil.read_image_from_file(f)
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        label, score = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
-        return json.dumps({'label': label, 'score': score})
+        results = mnist.predict(np.asarray(resized).astype(np.float32) / 255)
+        return json.dumps([{'label': x[0], 'score': x[1]} for x in results])
 
 
 @app.route('/upload')

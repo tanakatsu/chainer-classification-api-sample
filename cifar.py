@@ -11,7 +11,7 @@ def predict(img, top=3):
     model.predictor.train = False
     serializers.load_npz('models/cifar100_model.npz', model)
 
-    y = model.predictor(img.reshape(-1, 3, 32, 32))
+    y = model.predictor(img.reshape(-1, 3, 32, 32))  # demension: 3 -> 4
     pred = F.softmax(y).data
     labels = pred[0].argsort()[-top:][::-1]
     scores = pred[0][labels]

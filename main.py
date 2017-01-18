@@ -20,11 +20,15 @@ def load_labels():
     return labels
 
 
-def classify(img):
+def classify(img, n_candidates=3):
     resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
     input_img = imageutil.to_np_data_array(resized)
-    results = cifar.predict(input_img)
     labels = load_labels()
+    if n_candidates < 1:
+        n_candidates = 1
+    elif n_candidates >= len(labels):
+        n_candidates = len(labels)
+    results = cifar.predict(input_img, n_candidates)
     label_scores = [(labels[result[0]], result[1]) for result in results]
     return label_scores
 
@@ -47,13 +51,22 @@ def predict():
             return '''
             <h3>Error: Invalid parameter</h3>
             '''
+        if request.args.get('top'):
+            n_candidates = int(request.args.get('top'))
+        else:
+            n_candidates = 3
 
-        label_scores = classify(img)
+        label_scores = classify(img, n_candidates)
         return render_template('result.html', results=label_scores, image=imageutil.encode_base64(img))
     else:
         f = request.files['file']
+        if request.form and request.form['top']:
+            n_candidates = int(request.form['top'])
+        else:
+            n_candidates = 3
+
         img = imageutil.read_image_from_file(f)
-        label_scores = classify(img)
+        label_scores = classify(img, n_candidates)
         return render_template('result.html', results=label_scores, image=imageutil.encode_base64(img))
 
 
@@ -68,13 +81,22 @@ def predict_json():
             img = imageutil.read_image_from_url(url)
         else:
             return json.dumps({'error': 'Invalid parameter'})
-        label_scores = classify(img)
+
+        if request.args.get('top'):
+            n_candidates = int(request.args.get('top'))
+        else:
+            n_candidates = 3
+        label_scores = classify(img, n_candidates)
         return json.dumps(label_scores)
     else:
         f = request.files['file']
-        print(f.filename)
+
+        if request.form and request.form['top']:
+            n_candidates = int(request.form['top'])
+        else:
+            n_candidates = 3
         img = imageutil.read_image_from_file(f)
-        label_scores = classify(img)
+        label_scores = classify(img, n_candidates)
         return json.dumps(label_scores)
 
 

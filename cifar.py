@@ -5,7 +5,7 @@ from chainer import serializers
 import models.VGG
 
 
-def predict(img, top=3):
+def predict(img, n_candidates=3):
     class_labels = 100
     model = L.Classifier(models.VGG.VGG(class_labels))
     model.predictor.train = False
@@ -13,7 +13,7 @@ def predict(img, top=3):
 
     y = model.predictor(img.reshape(-1, 3, 32, 32))  # demension: 3 -> 4
     pred = F.softmax(y).data
-    labels = pred[0].argsort()[-top:][::-1]
+    labels = pred[0].argsort()[-n_candidates:][::-1]
     scores = pred[0][labels]
     scores = map(lambda x: float(x), scores)  # Decimal -> float
     return zip(labels, scores)

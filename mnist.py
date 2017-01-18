@@ -24,14 +24,14 @@ class MLP(chainer.Chain):
         return self.l3(h2)
 
 
-def predict(img, top=3):
+def predict(img, n_candidates=3):
     model = L.Classifier(MLP(1000, 10))
     serializers.load_npz('models/mnist_model.npz', model)
 
     # Predict
     y = model.predictor(img.reshape(-1, 784))
     pred = F.softmax(y).data
-    labels = pred[0].argsort()[-top:][::-1]
+    labels = pred[0].argsort()[-n_candidates:][::-1]
     scores = pred[0][labels]
     scores = map(lambda x: float(x), scores)  # Decimal -> float
     return zip(labels, scores)

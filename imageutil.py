@@ -32,6 +32,12 @@ def encode_base64(img):
     return 'data:image/jpeg;base64,' + encoded
 
 
+def to_np_data_array(img):
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+    return (np.asarray(img).astype(np.float32) / 255).transpose(2, 0, 1)
+
+
 def to_pil_image(np_img):
     # np_img dimension: (height, width, channel)
     return Image.fromarray((np_img * 255).astype(np.uint8))

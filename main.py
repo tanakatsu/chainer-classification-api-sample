@@ -40,7 +40,8 @@ def predict():
             <h3>Error: Invalid parameter</h3>
             '''
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        results = cifar.predict(np.asarray(resized).astype(np.float32) / 255)
+        input_img = imageutil.to_np_data_array(resized)
+        results = cifar.predict(input_img)
         labels = load_labels()
         label_scores = [(labels[result[0]], result[1]) for result in results]
         return render_template('result.html', results=label_scores, image=imageutil.encode_base64(img))
@@ -48,7 +49,8 @@ def predict():
         f = request.files['file']
         img = imageutil.read_image_from_file(f)
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        results = cifar.predict(np.asarray(resized).astype(np.float32) / 255)
+        input_img = imageutil.to_np_data_array(resized)
+        results = cifar.predict(input_img)
         labels = load_labels()
         label_scores = [(labels[result[0]], result[1]) for result in results]
         return render_template('result.html', results=label_scores, image=imageutil.encode_base64(img))
@@ -66,7 +68,8 @@ def predict_json():
         else:
             return json.dumps({'error': 'Invalid parameter'})
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        results = cifar.predict(np.asarray(resized).astype(np.float32) / 255)
+        input_img = imageutil.to_np_data_array(resized)
+        results = cifar.predict(input_img)
         labels = load_labels()
         label_scores = [(labels[result[0]], result[1]) for result in results]
         return json.dumps(label_scores)
@@ -75,7 +78,8 @@ def predict_json():
         print(f.filename)
         img = imageutil.read_image_from_file(f)
         resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        results = cifar.predict(np.asarray(resized).astype(np.float32) / 255)
+        input_img = imageutil.to_np_data_array(resized)
+        results = cifar.predict(input_img)
         labels = load_labels()
         label_scores = [(labels[result[0]], result[1]) for result in results]
         return json.dumps(label_scores)

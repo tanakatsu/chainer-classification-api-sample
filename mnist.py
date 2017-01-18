@@ -26,7 +26,7 @@ class MLP(chainer.Chain):
 
 def predict(img, top=3):
     model = L.Classifier(MLP(1000, 10))
-    serializers.load_npz('model/mnist_model.npz', model)
+    serializers.load_npz('models/mnist_model.npz', model)
 
     # Predict
     y = model.predictor(img.reshape(-1, 784))

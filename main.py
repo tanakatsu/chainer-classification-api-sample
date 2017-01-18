@@ -1,5 +1,4 @@
 from flask import Flask, request, render_template
-import numpy as np
 import json
 import pickle
 import imageutil
@@ -21,6 +20,15 @@ def load_labels():
     return labels
 
 
+def classify(img):
+    resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
+    input_img = imageutil.to_np_data_array(resized)
+    results = cifar.predict(input_img)
+    labels = load_labels()
+    label_scores = [(labels[result[0]], result[1]) for result in results]
+    return label_scores
+
+
 @app.route('/')
 def hello_world():
     return 'Hello.'
@@ -39,20 +47,13 @@ def predict():
             return '''
             <h3>Error: Invalid parameter</h3>
             '''
-        resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        input_img = imageutil.to_np_data_array(resized)
-        results = cifar.predict(input_img)
-        labels = load_labels()
-        label_scores = [(labels[result[0]], result[1]) for result in results]
+
+        label_scores = classify(img)
         return render_template('result.html', results=label_scores, image=imageutil.encode_base64(img))
     else:
         f = request.files['file']
         img = imageutil.read_image_from_file(f)
-        resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        input_img = imageutil.to_np_data_array(resized)
-        results = cifar.predict(input_img)
-        labels = load_labels()
-        label_scores = [(labels[result[0]], result[1]) for result in results]
+        label_scores = classify(img)
         return render_template('result.html', results=label_scores, image=imageutil.encode_base64(img))
 
 
@@ -67,21 +68,13 @@ def predict_json():
             img = imageutil.read_image_from_url(url)
         else:
             return json.dumps({'error': 'Invalid parameter'})
-        resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        input_img = imageutil.to_np_data_array(resized)
-        results = cifar.predict(input_img)
-        labels = load_labels()
-        label_scores = [(labels[result[0]], result[1]) for result in results]
+        label_scores = classify(img)
         return json.dumps(label_scores)
     else:
         f = request.files['file']
         print(f.filename)
         img = imageutil.read_image_from_file(f)
-        resized = img.resize((IMAGE_WIDTH, IMAGE_HEIGHT))
-        input_img = imageutil.to_np_data_array(resized)
-        results = cifar.predict(input_img)
-        labels = load_labels()
-        label_scores = [(labels[result[0]], result[1]) for result in results]
+        label_scores = classify(img)
         return json.dumps(label_scores)
 
 
